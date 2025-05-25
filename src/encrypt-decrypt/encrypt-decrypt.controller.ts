@@ -43,4 +43,37 @@ export class EncryptDecryptController {
       'data': result_data,
     };
   }
+
+  @Post('get-decrypt-data')
+  @ApiBody({ type: GetDecrptyDataDto })
+  @ApiResponse({ status: 200, description: 'Decrypt payload success' })
+  @ApiResponse({ status: 500, description: 'Decrypt payload fail' })
+  decrypt(@Body() getDecryptDataDto: GetDecrptyDataDto) {
+    let successful: boolean;
+    let error_code: string;
+    let result_data: null | ResponseDecryptData;
+    try {
+      const payload = this.encryptDecryptService.decryptPayload(getDecryptDataDto);
+
+      if (payload !== null) {
+        successful = true;
+        error_code = '200';
+        result_data = {
+          'payload' : payload
+        };
+      } else {
+        successful = false;
+        error_code = '500';
+        result_data = null
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+
+    return {
+      'successful': successful,
+      'error_code': error_code,
+      'data': result_data,
+    };
+  }
 }

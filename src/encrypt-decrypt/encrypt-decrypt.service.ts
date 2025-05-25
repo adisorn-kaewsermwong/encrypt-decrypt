@@ -72,4 +72,51 @@ export class EncryptDecryptService {
       encrypted_payload: encrypted_payload.toString('base64')
     }
   }
+
+  /**
+   * 
+   * @param payload_encryped 
+   * @param aes_key 
+   * @returns
+   */
+  decryptPayloadWithAesKey(payload_encryped: string, aes_key: Buffer) {
+    // decrypt payload
+    const decipher = crypto.createDecipheriv('aes-256-ecb', aes_key, null);
+    let decrypted = decipher.update(payload_encryped, 'base64', 'utf8');
+    decrypted += decipher.final('utf8');
+
+    return decrypted;
+  }
+
+  /**
+   * 
+   * @param aes_key_encrypted 
+   * @returns 
+   */
+  decryptAesKeyWithPublicKey(aes_key_encrypted: string) {
+    // convert string to Buffer type
+    const encrypted_aes_key_buffer = Buffer.from(aes_key_encrypted, 'base64')
+    // decrypt get AES key
+    const decrypted_aes_key = crypto.publicDecrypt(
+    {
+      key: this.public_key,
+      padding: crypto.constants.RSA_PKCS1_PADDING,
+    },
+      encrypted_aes_key_buffer
+    );
+
+    return decrypted_aes_key;
+  }
+
+  /**
+   * 
+   * @param getDecryptDataDto 
+   * @returns 
+   */
+  decryptPayload(getDecryptDataDto: GetDecrptyDataDto): string {
+      const decrypted_aes_key = this.decryptAesKeyWithPublicKey(getDecryptDataDto.data1);
+      const payload = this.decryptPayloadWithAesKey(getDecryptDataDto.data2, decrypted_aes_key);
+
+      return payload;
+  }
 }
