@@ -1,15 +1,16 @@
-import { Controller, Post, Body, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Post, Body, InternalServerErrorException, HttpCode } from '@nestjs/common';
 import { EncryptDecryptService } from './encrypt-decrypt.service';
 import { GetEncrptyDataDto } from './dto/get-encrypt-data.dto';
 import { JsonResponseEncryptData, ResponseDecryptData, ResponseEncryptData } from './dto/response-data.dto';
 import { GetDecrptyDataDto } from './dto/get-decrypt-data.dto';
 import { ApiBody, ApiResponse } from '@nestjs/swagger';
 
-@Controller('encrypt-decrypt')
+@Controller('')
 export class EncryptDecryptController {
   constructor(private readonly encryptDecryptService: EncryptDecryptService) {}
 
   @Post('get-encrypt-data')
+  @HttpCode(200)
   @ApiBody({ type: GetEncrptyDataDto })
   @ApiResponse({ status: 200, description: 'Encrypt payload success' })
   @ApiResponse({ status: 500, description: 'Encrypt payload fail' })
@@ -20,7 +21,7 @@ export class EncryptDecryptController {
 
     try {
       const service_result = this.encryptDecryptService.encryptPayload(getEncryptDataDto);
-      
+      console.log(service_result);
       if (service_result.aes_encryped !== null && service_result.encrypted_payload !== null) {
         successful = true;
         error_code = '200';
@@ -45,6 +46,7 @@ export class EncryptDecryptController {
   }
 
   @Post('get-decrypt-data')
+  @HttpCode(200)
   @ApiBody({ type: GetDecrptyDataDto })
   @ApiResponse({ status: 200, description: 'Decrypt payload success' })
   @ApiResponse({ status: 500, description: 'Decrypt payload fail' })
